@@ -1,0 +1,35 @@
+name: Rebase
+
+on:
+  push:
+    branches:
+      - extended
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Config git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Install px
+        run: |
+          wget -O ~/px https://raw.githubusercontent.com/m2-farzan/px/main/px
+          chmod +x ~/px
+          pip3 install pathspec
+
+      - name: Rebase
+        run: bash .github/workflows/rebase_master.sh
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: refs/heads/master
+          github_token: ${{ secrets.GITHUB_TOKEN }}

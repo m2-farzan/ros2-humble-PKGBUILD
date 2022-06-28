@@ -1,0 +1,17 @@
+name: test
+
+on: workflow_dispatch
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ghcr.io/greyltc-org/archlinux-aur:yay
+          options: -v ${{ github.workspace }}:/ros2-humble-pkgbuild
+          run: bash /ros2-humble-pkgbuild/.github/workflows/test.bash
