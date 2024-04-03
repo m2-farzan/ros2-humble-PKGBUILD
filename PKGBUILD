@@ -8,12 +8,13 @@
 # Contributor: Yannic Wehner <yannic.wehner@gmail.com> (github.com/ElCap1tan)
 # Contributor: Kino <github.com/cybaol>
 # Contributor: Zijian <github.com/zijian-x>
+# Contributor: Jingbei Li <github.com/petronny>
 # Acknowledgment: This work is hugely based on `ros2-arch-deps` AUR
 # package, maintained by T. Borgert.
 
 pkgname=ros2-humble
 pkgver=2024.02.22
-pkgrel=2
+pkgrel=3
 pkgdesc="A set of software libraries and tools for building robot applications"
 url="https://docs.ros.org/en/humble/"
 arch=('any')
@@ -72,8 +73,8 @@ build() {
     ## For people with the old version of makepkg.conf
     unset CPPFLAGS
     ## For people with the new version of makepkg.conf
-    CFLAGS=$(sed "s/-Wp,-D_FORTIFY_SOURCE=3\s//g" <(echo $CFLAGS))
-    CXXFLAGS=$(sed "s/-Wp,-D_FORTIFY_SOURCE=3\s//g" <(echo $CXXFLAGS))
+    CFLAGS=$(sed "s/-Wp,-D_FORTIFY_SOURCE=[23]\s//g" <(echo $CFLAGS))
+    CXXFLAGS=$(sed "s/-Wp,-D_FORTIFY_SOURCE=[23]\s//g" <(echo $CXXFLAGS))
 
     # Build
     colcon build --merge-install ${COLCON_EXTRA_ARGS} --cmake-args -Wno-dev
