@@ -9,6 +9,7 @@
 # Contributor: Kino <github.com/cybaol>
 # Contributor: Zijian <github.com/zijian-x>
 # Contributor: Jingbei Li <github.com/petronny>
+# Contributor: Levi Tempfli <github.com/levtempfli>
 # Acknowledgment: This work is hugely based on `ros2-arch-deps` AUR
 # package, maintained by T. Borgert.
 
@@ -77,7 +78,7 @@ build() {
     CXXFLAGS=$(sed "s/-Wp,-D_FORTIFY_SOURCE=[23]\s//g" <(echo $CXXFLAGS))
 
     # Build
-    colcon build --merge-install ${COLCON_EXTRA_ARGS} --cmake-args -Wno-dev
+    colcon build --merge-install ${COLCON_EXTRA_ARGS} --cmake-args -Wno-dev --packages-ignore qt_gui_cpp rqt_gui_cpp
 }
 
 package() {
