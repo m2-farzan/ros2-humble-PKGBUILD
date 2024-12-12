@@ -7,8 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
-      - name: Setup Docker
-        uses: actions/setup-docker@v2
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Arch container
