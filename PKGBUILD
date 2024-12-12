@@ -15,7 +15,7 @@
 
 pkgname=ros2-humble
 pkgver=2024.02.22
-pkgrel=4
+pkgrel=5
 pkgdesc="A set of software libraries and tools for building robot applications"
 url="https://docs.ros.org/en/humble/"
 arch=('any')
@@ -28,6 +28,8 @@ depends=(
     'gmock'
 )
 makedepends=('git')
+provides=('ros2-humble-base')
+conflicts=('ros2-humble-base')
 source=(
     "ros2::git+https://github.com/ros2/ros2#tag=release-humble-${pkgver//.}"
 )
