@@ -7,11 +7,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
+      - name: Setup Docker
+        uses: actions/setup-docker@v2
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ghcr.io/greyltc-org/archlinux-aur:yay
-          options: -v ${{ github.workspace }}:/ros2-humble-pkgbuild
-          run: bash /ros2-humble-pkgbuild/.github/workflows/test.bash
+      - name: Setup Arch container
+        run: |
+          docker run --rm --name arch ghcr.io/greyltc-org/archlinux-aur:yay sleep 18000
+          docker exec arch bash -c "sudo pacman -Syyu --noconfirm --noprogressbar"
+          docker cp . arch:/ros2-humble-pkgbuild
+          docker exec arch chown -R ab:ab /ros2-humble-pkgbuild
+      - name: Validate SRCINFO
+        run: |
+          docker exec arch bash -c "cd /ros2-humble-pkgbuild && cmp -s .SRCINFO <(makepkg --printsrcinfo) || echo 'SRCINFO is out of sync'"
+      - name: Install dependencies
+        run: |
+          docker exec arch bash -c "cat /ros2-humble-pkgbuild/.SRCINFO | grep -oP 'depends\ \=\ \K.+' | xargs sudo -u ab yay -S --noconfirm --noprogressbar --needed"
+      - name: Build package
+        run: |
+          docker exec arch bash -c "cd /ros2-humble-pkgbuild && sudo -u ab makepkg"
