@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup Arch container
         run: |
-          docker run --rm --name arch ghcr.io/greyltc-org/archlinux-aur:yay sleep 18000
+          docker run -d --rm --name arch ghcr.io/greyltc-org/archlinux-aur:yay sleep 18000
           docker exec arch bash -c "sudo pacman -Syyu --noconfirm --noprogressbar"
           docker cp . arch:/ros2-humble-pkgbuild
           docker exec arch chown -R ab:ab /ros2-humble-pkgbuild
