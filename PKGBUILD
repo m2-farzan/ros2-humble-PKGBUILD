@@ -15,10 +15,10 @@
 
 pkgname=ros2-humble
 pkgver=2024.02.22
-pkgrel=6
+pkgrel=7
 pkgdesc="A set of software libraries and tools for building robot applications"
 url="https://docs.ros.org/en/humble/"
-arch=('any')
+arch=('x86_64')
 license=('Apache')
 depends=(
     'ros2-arch-deps'
@@ -80,7 +80,7 @@ build() {
     CXXFLAGS=$(sed "s/-Wp,-D_FORTIFY_SOURCE=[23]\s//g" <(echo $CXXFLAGS))
 
     # Build
-    colcon build --merge-install ${COLCON_EXTRA_ARGS} --cmake-args " -Wno-dev" --packages-ignore qt_gui_cpp rqt_gui_cpp
+    colcon build --merge-install ${COLCON_EXTRA_ARGS} --cmake-args " -DBUILD_TESTING=OFF -Wno-dev" --packages-ignore qt_gui_cpp rqt_gui_cpp
 }
 
 package() {
