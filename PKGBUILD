@@ -14,8 +14,8 @@
 # package, maintained by T. Borgert.
 
 pkgname=ros2-humble
-pkgver=2024.02.22
-pkgrel=7
+pkgver=2025.03.31
+pkgrel=1
 pkgdesc="A set of software libraries and tools for building robot applications"
 url="https://docs.ros.org/en/humble/"
 arch=('x86_64')
@@ -27,11 +27,11 @@ depends=(
     'assimp'
     'gmock'
 )
-makedepends=('git')
+makedepends=('cmake3' 'git')
 provides=('ros2-humble-base')
 conflicts=('ros2-humble-base')
 source=(
-    "ros2::git+https://github.com/ros2/ros2#tag=release-humble-${pkgver//.}"
+    "ros2::git+https://github.com/ros2/ros2#tag=humble-${pkgver//.}"
 )
 sha256sums=('SKIP')
 install=ros2-humble.install
@@ -39,7 +39,7 @@ install=ros2-humble.install
 prepare() {
     # Check locale according to
     # https://docs.ros.org/en/rolling/Installation/Ubuntu-Development-Setup.html#set-locale
-        if ! locale | grep LANG | grep 'UTF-8\|utf8' > /dev/null; then
+    if ! locale | grep LANG | grep 'UTF-8\|utf8' > /dev/null; then
         echo 'Your locale must support UTF-8. See ' \
              'https://wiki.archlinux.org/index.php/locale and ' \
              'https://docs.ros.org/en/rolling/Installation/Ubuntu-Development-Setup.html#set-locale'
@@ -50,19 +50,8 @@ prepare() {
     mkdir -p $srcdir/ros2/src
     vcs import $srcdir/ros2/src < $srcdir/ros2/ros2.repos
 
-    # Setup git (required for the cherry-pick commands)
-    export GIT_COMMITTER_NAME="PKGBUILD"
-    export GIT_COMMITTER_EMAIL="pkgbuild@example.com"
-    export GIT_AUTHOR_NAME="PKGBUILD"
-    export GIT_AUTHOR_EMAIL="pkgbuild@example.com"
-
-    # Fix some issues in the code (TODO: Gradually move to upstream)
-    ## libstatistics_collector: Fix missing cstdint include
-    git -C $srcdir/ros2/src/ros-tooling/libstatistics_collector cherry-pick 1c340c97c731019d0c7b40f8c167b0ef666bcf75
-    ## pybind11_vendor: Support for python 3.11
-    git -C $srcdir/ros2/src/ros2/pybind11_vendor checkout 3.0.3
-    ## rosbag2_compression: cherry pick to fix missing cstdint include
-    git -C $srcdir/ros2/src/ros2/rosbag2 cherry-pick 65c889e1fa55dd85a148b27b8c27dadc73238e67
+    cd $srcdir/ros2/src/eProsima/Fast-DDS
+    git submodule update --init thirdparty/asio
 }
 
 build() {
@@ -80,6 +69,8 @@ build() {
     CXXFLAGS=$(sed "s/-Wp,-D_FORTIFY_SOURCE=[23]\s//g" <(echo $CXXFLAGS))
 
     # Build
+    ## To resolve the io_service removal in Asio 1.33.0, build FastRTPS against third-party Asio.
+    colcon build --merge-install --packages-up-to fastrtps --cmake-args " -DTHIRDPARTY_Asio=FORCE"
     colcon build --merge-install ${COLCON_EXTRA_ARGS} --cmake-args " -DBUILD_TESTING=OFF -Wno-dev" --packages-ignore qt_gui_cpp rqt_gui_cpp
 }
 
