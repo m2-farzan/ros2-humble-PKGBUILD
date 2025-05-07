@@ -15,7 +15,7 @@
 
 pkgname=ros2-humble
 pkgver=2025.03.31
-pkgrel=1
+pkgrel=2
 pkgdesc="A set of software libraries and tools for building robot applications"
 url="https://docs.ros.org/en/humble/"
 arch=('x86_64')
@@ -27,7 +27,7 @@ depends=(
     'assimp'
     'gmock'
 )
-makedepends=('cmake3' 'git')
+makedepends=('cmake3' 'git' 'gcc13')
 provides=('ros2-humble-base')
 conflicts=('ros2-humble-base')
 source=(
@@ -52,6 +52,9 @@ prepare() {
 
     cd $srcdir/ros2/src/eProsima/Fast-DDS
     git submodule update --init thirdparty/asio
+
+    # pybind11_vendor: Use jazzy branch to make compatible with Python 3.11 and later.
+    git -C $srcdir/ros2/src/ros2/pybind11_vendor checkout 3.1.3
 }
 
 build() {
@@ -69,6 +72,8 @@ build() {
     CXXFLAGS=$(sed "s/-Wp,-D_FORTIFY_SOURCE=[23]\s//g" <(echo $CXXFLAGS))
 
     # Build
+    ## Downgrade gcc to fix missing cstdint headers in many packages.
+    export CC=$(command -v gcc-13) CXX=$(command -v g++-13)
     ## To resolve the io_service removal in Asio 1.33.0, build FastRTPS against third-party Asio.
     colcon build --merge-install --packages-up-to fastrtps --cmake-args " -DTHIRDPARTY_Asio=FORCE"
     colcon build --merge-install ${COLCON_EXTRA_ARGS} --cmake-args " -DBUILD_TESTING=OFF -Wno-dev" --packages-ignore qt_gui_cpp rqt_gui_cpp
