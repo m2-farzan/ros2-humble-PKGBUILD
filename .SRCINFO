@@ -1,13 +1,14 @@
 pkgbase = ros2-humble
 	pkgdesc = A set of software libraries and tools for building robot applications
 	pkgver = 2025.03.31
-	pkgrel = 1
+	pkgrel = 2
 	url = https://docs.ros.org/en/humble/
 	install = ros2-humble.install
 	arch = x86_64
 	license = Apache
 	makedepends = cmake3
 	makedepends = git
+	makedepends = gcc13
 	depends = ros2-arch-deps
 	depends = qt6-base
 	depends = nvidia-cg-toolkit
