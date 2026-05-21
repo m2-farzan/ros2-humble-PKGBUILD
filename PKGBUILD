@@ -15,7 +15,7 @@
 
 pkgname=ros2-humble
 pkgver=2026.02.20
-pkgrel=1
+pkgrel=2
 pkgdesc="A set of software libraries and tools for building robot applications"
 url="https://docs.ros.org/en/humble/"
 arch=('x86_64')
@@ -55,6 +55,15 @@ prepare() {
 
     # pybind11_vendor: Use jazzy branch to make compatible with Python 3.11 and later.
     git -C $srcdir/ros2/src/ros2/pybind11_vendor checkout 3.1.3
+
+    # Setup git (required for the cherry-pick commands)
+    export GIT_COMMITTER_NAME="PKGBUILD"
+    export GIT_COMMITTER_EMAIL="pkgbuild@example.com"
+    export GIT_AUTHOR_NAME="PKGBUILD"
+    export GIT_AUTHOR_EMAIL="pkgbuild@example.com"
+
+    # Fix the unused variable error https://aur.archlinux.org/packages/ros2-humble#comment-1072390
+    git -C $srcdir/ros2/src/eProsima/Fast-DDS cherry-pick 754655e466977ba5a882d4a11586a7c08084446e
 }
 
 build() {
